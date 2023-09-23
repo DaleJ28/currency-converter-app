@@ -1,5 +1,8 @@
-// Home.js
 import React from 'react';
+import currencies from './utils/currencies';
+import { checkStatus, json } from './utils/fetchUtils';
+import CurrencyTable from './CurrencyTable';
+
 
 class Home extends React.Component {
   constructor () {
@@ -10,8 +13,33 @@ class Home extends React.Component {
     }
   }
 
+  componentDidMount() {
+    this.getRatesData(this.state.base); //store data from api
+  }
+
   changeBase = (event) => {
     this.setState({ base: event.target.value });
+  }
+  //function to fetch and store the data
+  getRatesData = (base) => {
+    fetch(`https://api.frankfurter.app/latest?from=${base}`)
+      .then(checkStatus)
+      .then(json)
+      .then(data => {
+        if (data.error) {
+          throw new Error(data.error);
+        }
+        const rates = Object.keys(data.rates)
+        .filter(acronym => acronym !== base)
+        .map(acronym => ({  //Map the array and return an object containing acronym, exchange rate, name, and symbol for each currency
+          acronym,
+          rate: data.rates[acronym],
+          name: currencies[acronym].name,
+          symbol: currencies[acronym].symbol,
+        }))
+      this.setState({ rates });
+      })
+      .catch(error => console.error(error.message));
   }
 
   render () {
@@ -22,10 +50,11 @@ class Home extends React.Component {
         <form className="p-3 bg-light form-inline justify-content-center">
           <h3 className="mb-2">Base currency: <b className="mr-2">1</b></h3>
           <select value={base} onChange={this.changeBase} className="form-control form-control-lg mb-2">
-            <option value="USD">USD</option>
-            <option value="USD">EUR</option>
+{Object.keys(currencies).map(currencyAcronym => <option key={currencyAcronym} value={currencyAcronym}>{currencyAcronym}</option>)}
+
           </select>
         </form>
+        <CurrencyTable base={base} rates={rates} />
       </React.Fragment>
     )
   }
