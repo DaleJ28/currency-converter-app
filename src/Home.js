@@ -10,6 +10,7 @@ class Home extends React.Component {
     this.state = {
       base: 'USD',
       rates: null,
+      loading: true,
     }
   }
 
@@ -19,9 +20,11 @@ class Home extends React.Component {
 
   changeBase = (event) => {
     this.setState({ base: event.target.value });
+    this.getRatesData(event.target.value); //changing base currency drop down fetches new data
   }
   //function to fetch and store the data
   getRatesData = (base) => {
+    this.setState({ loading: true });
     fetch(`https://api.frankfurter.app/latest?from=${base}`)
       .then(checkStatus)
       .then(json)
@@ -37,19 +40,20 @@ class Home extends React.Component {
           name: currencies[acronym].name,
           symbol: currencies[acronym].symbol,
         }))
-      this.setState({ rates });
+        
+      this.setState({ rates,  loading: false });
       })
       .catch(error => console.error(error.message));
   }
 
   render () {
-    const { base, rates } = this.state;
+    const { base, rates, loading } = this.state;
 
     return (
       <React.Fragment>
         <form className="p-3 bg-light form-inline justify-content-center">
           <h3 className="mb-2">Base currency: <b className="mr-2">1</b></h3>
-          <select value={base} onChange={this.changeBase} className="form-control form-control-lg mb-2">
+          <select value={base} onChange={this.changeBase} className="form-control form-control-lg mb-2" disabled={loading}>
 {Object.keys(currencies).map(currencyAcronym => <option key={currencyAcronym} value={currencyAcronym}>{currencyAcronym}</option>)}
 
           </select>
