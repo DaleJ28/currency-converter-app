@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import currencies from './utils/currencies';
-import { checkStatus } from './utils/fetchUtils';
+import { checkStatus, json } from './utils/fetchUtils';
 import App from './App';
 // import reportWebVitals from './reportWebVitals';
 
@@ -73,7 +73,7 @@ class CurrencyConverter extends React.Component {
     this.setState({ quoteAcronym });
     this.getRate(this.state.baseAcronym, quoteAcronym);
     }
-    
+
   changeQuoteValue = (event) => {
     const baseValue = this.convert(event.target.value, this.state.rate, this.toBase);
     this.setState({
