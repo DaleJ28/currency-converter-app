@@ -9,7 +9,7 @@ import './App.css';
 
 const App = () => {
   return (
-    <Router basename="/currency-converter">
+    <Router basename="/currency-converter-app">
       <Layout>
         <Switch>
           <Route path="/" exact component={Home} />
